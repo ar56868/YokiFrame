@@ -9,7 +9,7 @@ namespace YokiFrame.Unity
     public sealed partial class YooAssetResourceProvider
     {
         /// <summary>复制并校验探测清单，拒绝空清单和未就绪 package。</summary>
-        private static ResourcePackage[] CopyReadyPackages(IReadOnlyList<ResourcePackage> packages)
+        private static List<ResourcePackage> CopyReadyPackages(IReadOnlyList<ResourcePackage> packages)
         {
             if (packages == null || packages.Count == 0)
                 throw new ArgumentException("At least one YooAsset package is required.", nameof(packages));
@@ -28,10 +28,7 @@ namespace YokiFrame.Unity
 
                 ready.Add(package);
             }
-
-            if (ready.Count == 0)
-                throw new ArgumentException("At least one YooAsset package is required.", nameof(packages));
-            return ready.ToArray();
+            return ready;
         }
 
         /// <summary>判断探测清单是否已经包含同名 package，避免重复探测。</summary>
@@ -56,7 +53,7 @@ namespace YokiFrame.Unity
             if (!string.IsNullOrEmpty(packageName))
                 return RequirePackage(packageName);
 
-            for (int index = 0; index < mPackages.Length; index++)
+            for (int index = 0; index < mPackages.Count; index++)
             {
                 ResourcePackage candidate = mPackages[index];
                 if (YooAssetPackageReadiness.IsReady(candidate) && IsLocationValid(candidate, location))
@@ -90,7 +87,7 @@ namespace YokiFrame.Unity
         /// <summary>在构造时固定的探测清单中按 Ordinal 名称查找 package。</summary>
         private ResourcePackage FindPackage(string packageName)
         {
-            for (int index = 0; index < mPackages.Length; index++)
+            for (int index = 0; index < mPackages.Count; index++)
             {
                 ResourcePackage package = mPackages[index];
                 if (string.Equals(package.PackageName, packageName, StringComparison.Ordinal))
@@ -98,6 +95,10 @@ namespace YokiFrame.Unity
             }
 
             return null;
+        }
+        public void AddPackage(ResourcePackage package)
+        {
+            mPackages.Add(package);
         }
     }
 }

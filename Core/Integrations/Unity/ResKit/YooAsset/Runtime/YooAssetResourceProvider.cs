@@ -26,7 +26,7 @@ namespace YokiFrame.Unity
         IResourceProviderCapabilities
     {
         private readonly object mLock = new();
-        private readonly ResourcePackage[] mPackages;
+        private List<ResourcePackage> mPackages;
         private readonly bool mEditorSimulateMode;
         private readonly Dictionary<object, Stack<AssetHandle>> mHandles =
             new(ReferenceEqualityComparer.Instance);
@@ -214,7 +214,7 @@ namespace YokiFrame.Unity
         /// <summary>校验探测清单和 location，确保同步与异步入口使用相同前置条件。</summary>
         private void EnsureRequestPath(string path)
         {
-            if (mPackages.Length == 0 || !YooAssetPackageReadiness.IsReady(mPackages[0]))
+            if (mPackages.Count == 0 || !YooAssetPackageReadiness.IsReady(mPackages[0]))
             {
                 throw new InvalidOperationException(
                     "YooAsset ResourcePackage must be initialized successfully before installing the ResKit provider.");
