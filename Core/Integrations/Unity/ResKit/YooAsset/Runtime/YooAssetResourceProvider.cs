@@ -65,7 +65,9 @@ namespace YokiFrame.Unity
             mPackages = CopyReadyPackages(packages);
             mEditorSimulateMode = editorSimulateMode;
 #if UNITY_EDITOR
-            ProviderName = "YooAsset:" + mPackages[0].PackageName;
+            ProviderName = mPackages.Count > 0
+                ? "YooAsset:" + mPackages[0].PackageName
+                : "YooAsset";
 #endif
         }
 
@@ -214,10 +216,16 @@ namespace YokiFrame.Unity
         /// <summary>校验探测清单和 location，确保同步与异步入口使用相同前置条件。</summary>
         private void EnsureRequestPath(string path)
         {
-            if (mPackages.Count == 0 || !YooAssetPackageReadiness.IsReady(mPackages[0]))
+            if (mPackages == null || mPackages.Count == 0)
             {
                 throw new InvalidOperationException(
-                    "YooAsset ResourcePackage must be initialized successfully before installing the ResKit provider.");
+                    "No YooAsset ResourcePackage is registered with the ResKit provider.");
+            }
+
+            if (!YooAssetPackageReadiness.IsReady(mPackages[0]))
+            {
+                throw new InvalidOperationException(
+                    "YooAsset ResourcePackage must be initialized successfully before loading resources.");
             }
 
             if (string.IsNullOrWhiteSpace(path))

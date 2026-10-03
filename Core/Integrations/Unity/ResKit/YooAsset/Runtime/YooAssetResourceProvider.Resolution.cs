@@ -8,11 +8,11 @@ namespace YokiFrame.Unity
 {
     public sealed partial class YooAssetResourceProvider
     {
-        /// <summary>复制并校验探测清单，拒绝空清单和未就绪 package。</summary>
+        /// <summary>复制并校验探测清单；空清单表示等待后续动态添加 package。</summary>
         private static List<ResourcePackage> CopyReadyPackages(IReadOnlyList<ResourcePackage> packages)
         {
             if (packages == null || packages.Count == 0)
-                throw new ArgumentException("At least one YooAsset package is required.", nameof(packages));
+                return new List<ResourcePackage>();
 
             var ready = new List<ResourcePackage>(packages.Count);
             for (int index = 0; index < packages.Count; index++)
@@ -60,6 +60,12 @@ namespace YokiFrame.Unity
                     return candidate;
             }
 
+            if (mPackages.Count == 0)
+            {
+                throw new InvalidOperationException(
+                    "No YooAsset ResourcePackage is registered with the ResKit provider.");
+            }
+
             return mPackages[0];
         }
 
@@ -73,7 +79,7 @@ namespace YokiFrame.Unity
 #endif
         }
 
-        /// <summary>在构造时固定的探测清单中查找显式 package，缺失时给出稳定错误。</summary>
+        /// <summary>在当前动态探测清单中查找显式 package，缺失时给出稳定错误。</summary>
         private ResourcePackage RequirePackage(string packageName)
         {
             ResourcePackage selected = FindPackage(packageName);
@@ -84,9 +90,12 @@ namespace YokiFrame.Unity
                 "YooAsset package '" + packageName + "' is not registered with the ResKit provider.");
         }
 
-        /// <summary>在构造时固定的探测清单中按 Ordinal 名称查找 package。</summary>
+        /// <summary>在当前探测清单中按 Ordinal 名称查找 package。</summary>
         private ResourcePackage FindPackage(string packageName)
         {
+            if (mPackages == null)
+                return null;
+
             for (int index = 0; index < mPackages.Count; index++)
             {
                 ResourcePackage package = mPackages[index];
@@ -96,8 +105,30 @@ namespace YokiFrame.Unity
 
             return null;
         }
+
+        /// <summary>追加或替换一个已初始化的 YooAsset package。</summary>
         public void AddPackage(ResourcePackage package)
         {
+            if (package == null)
+                throw new ArgumentNullException(nameof(package));
+            if (!YooAssetPackageReadiness.IsReady(package))
+            {
+                throw new InvalidOperationException(
+                    "YooAsset ResourcePackage must be initialized successfully before adding it to the ResKit provider.");
+            }
+
+            if (mPackages == null)
+                mPackages = new List<ResourcePackage>();
+
+            for (int index = 0; index < mPackages.Count; index++)
+            {
+                if (string.Equals(mPackages[index].PackageName, package.PackageName, StringComparison.Ordinal))
+                {
+                    mPackages[index] = package;
+                    return;
+                }
+            }
+
             mPackages.Add(package);
         }
     }
