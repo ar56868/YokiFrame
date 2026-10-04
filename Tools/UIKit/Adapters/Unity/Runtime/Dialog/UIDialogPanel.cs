@@ -96,7 +96,7 @@ namespace YokiFrame
         }
 
         /// <summary>提交结果并请求 UIKit 关闭当前对话框。</summary>
-        private void SendAndClose(DialogResult result)
+        public void SendAndClose(DialogResult result)
         {
             SendResult(result);
             CloseSelf();
