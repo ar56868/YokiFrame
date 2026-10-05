@@ -13,7 +13,7 @@ LogKit 可直接用于 Unity 与 Godot .NET Runtime。控制台输出由当前�
 ```csharp
 using YokiFrame;
 
-LogKit.Info("Player ready");
+LogKit.Log("Player ready");
 LogKit.Warning("Profile fallback used");
 LogKit.Error("Profile load failed");
 
@@ -56,8 +56,8 @@ catch (System.Exception exception)
 |---|---|---|
 | `IEngineLogger` | `Log(LogLevel level, string message, object context = null)` | 宿主控制台的最小 Runtime 契约。 |
 | `IEngineLoggerWithStackTrace` | `Log(LogLevel, string, object, string)` | 仅工具 logger 可选实现的扩展点，用于接收异常堆栈；内置 Unity/Godot 后端不实现，调用点由宿主原生堆栈呈现。 |
-| `LogKitStats` | `LoggerName`、`HasLogger`、`Enabled`、`MinimumLevel`、`HistoryCount`、`DroppedCount` | 工具统计快照。 |
-| `LogKitEntry` | `Level`、`Message`、`Context`、`ExceptionType`、`ExceptionMessage`、`StackTrace`、`TimestampUtc` | 工具历史条目。 |
+| `LogKitStats` | `LoggerName`、`HasLogger`、`Enabled`、`MinimumLevel`、`HistoryCount`、`DroppedCount` | 只在 Editor 或 Godot Tools 中编译的统计快照。 |
+| `LogKitEntry` | `Level`、`Message`、`Context`、`ExceptionType`、`ExceptionMessage`、`StackTrace`、`TimestampUtc` | 只在 Editor 或 Godot Tools 中编译的历史条目。 |
 
 ### Runtime Settings
 

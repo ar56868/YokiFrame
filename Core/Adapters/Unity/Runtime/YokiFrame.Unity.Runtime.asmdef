@@ -3,6 +3,7 @@
     "rootNamespace": "YokiFrame.Unity",
     "references": [
         "GUID:224151c835b786a4f8efadaa1799380d",
+        "YokiFrame.Unity.Shared",
         "UniTask"
     ],
     "includePlatforms": [],
